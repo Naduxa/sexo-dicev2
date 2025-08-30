@@ -1,7 +1,6 @@
-// Telegram WebApp init
 const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.expand(); // растянуть на весь экран
+if (tg){
+  tg.expand();
   tg.setHeaderColor('#0e0f12');
   tg.setBackgroundColor('#0e0f12');
 }
@@ -28,9 +27,9 @@ const PARTS = {
 
 const die1 = document.getElementById('die1');
 const die2 = document.getElementById('die2');
+const label1 = document.getElementById('label1');
+const label2 = document.getElementById('label2');
 const rollBtn = document.getElementById('rollBtn');
-const againBtn = document.getElementById('againBtn');
-const result = document.getElementById('result');
 const spice = document.getElementById('spice');
 
 let rolling = false;
@@ -42,11 +41,11 @@ function setFace(el, v){
 }
 
 async function haptic(type="impact"){
-  try {
+  try{
     if (!tg || !tg.HapticFeedback) return;
     if (type==="impact") tg.HapticFeedback.impactOccurred("medium");
     if (type==="success") tg.HapticFeedback.notificationOccurred("success");
-  } catch(e){}
+  }catch(e){}
 }
 
 async function roll(){
@@ -54,29 +53,34 @@ async function roll(){
   rolling = true;
   await haptic("impact");
 
-  // визуальная анимация
-  die1.classList.add('rolling');
-  die2.classList.add('rolling');
+  // скрываем прошлые подписи и запускаем «кручение»
+  die1.classList.remove('show'); die2.classList.remove('show');
+  die1.classList.add('rolling'); die2.classList.add('rolling');
+
   const v1 = rnd1to6();
   const v2 = rnd1to6();
 
-  // задержка под анимацию
   await new Promise(r => setTimeout(r, 850));
+
   setFace(die1, v1);
   setFace(die2, v2);
-  die1.classList.remove('rolling');
+  die1.classList.remove('rolling'); 
   die2.classList.remove('rolling');
 
   const mode = spice.value;
-  const a = ACTIONS[mode][v1-1];
-  const p = PARTS[mode][v2-1];
+  label1.textContent = ACTIONS[mode][v1-1];
+  label2.textContent = PARTS[mode][v2-1];
 
-  result.innerHTML = `👉 Задание: <strong>${a} ${p}</strong>`;
+  die1.classList.add('show'); 
+  die2.classList.add('show');
+
   await haptic("success");
+  rolling = false;
 }
 
 rollBtn.addEventListener('click', roll);
-againBtn.addEventListener('click', roll);
 
-// Первичная отрисовка
+// первичная отрисовка
 setFace(die1, 1); setFace(die2, 1);
+label1.textContent = "";
+label2.textContent = "";
