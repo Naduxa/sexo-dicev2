@@ -16,25 +16,28 @@
 
     <main>
       <div class="dice-wrap">
-        <div id="die1" class="die face-1"></div>
-        <div id="die2" class="die face-1"></div>
+      <div id="die1" class="die face-1">
+        <span id="label1" class="label"></span>
       </div>
-
-      <button id="rollBtn" class="roll">Бросить</button>
-
-      <div id="result" class="result">Нажми «Бросить»</div>
-
-      <div class="controls">
-        <label class="mode">
-          Режим:
-          <select id="spice">
-            <option value="soft">мягкий</option>
-            <option value="spicy">смелый</option>
-            <option value="extra">экстра</option>
-          </select>
-        </label>
-        <button id="againBtn" class="ghost">Ещё раз</button>
+      <div id="die2" class="die face-1">
+        <span id="label2" class="label"></span>
       </div>
+    </div>
+    
+    <button id="rollBtn" class="roll">Бросить</button>
+    
+    <!-- <div id="result" class="result">Нажми «Бросить»</div>  — больше не нужен -->
+    <div class="controls">
+      <label class="mode">
+        Режим:
+        <select id="spice">
+          <option value="soft">мягкий</option>
+          <option value="spicy">смелый</option>
+          <option value="extra">экстра</option>
+        </select>
+      </label>
+    </div>
+
     </main>
 
     <footer>
