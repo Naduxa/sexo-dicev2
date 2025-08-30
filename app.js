@@ -1,4 +1,4 @@
-// v=4
+// v=5
 const tg = window.Telegram?.WebApp;
 if (tg){
   tg.expand();
@@ -37,7 +37,7 @@ let rolling = false;
 
 function rnd1to6(){ return 1 + Math.floor(Math.random()*6); }
 function setFace(el, v){
-  // классы лиц оставляем для «виртуального» состояния, визуально точек нет
+  // «лица» оставляем только как внутреннее состояние — визуально точек нет
   el.classList.remove('face-1','face-2','face-3','face-4','face-5','face-6');
   el.classList.add(`face-${v}`);
 }
@@ -80,10 +80,11 @@ async function roll(){
   rolling = false;
 }
 
+// кнопка
 rollBtn.textContent = "Бросай";
 rollBtn.addEventListener('click', roll);
 
-// первичная отрисовка — вводные на кубиках
+// ПЕРВЫЙ ЭКРАН — вводные на кубиках
 setFace(die1, 1); setFace(die2, 1);
 label1.textContent = "действие";
 label2.textContent = "часть тела";
