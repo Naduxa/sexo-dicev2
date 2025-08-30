@@ -10,8 +10,7 @@ h1 { margin:0; font-size:24px; }
 main { display:flex; flex-direction:column; align-items:center; gap:16px; }
 .dice-wrap { display:flex; gap:24px; justify-content:center; align-items:center; padding:12px; }
 
-/* КУБИК */
-.die{
+.die {
   width:96px; height:96px; border-radius:18px; background:var(--card);
   position:relative; overflow:hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05);
@@ -19,26 +18,42 @@ main { display:flex; flex-direction:column; align-items:center; gap:16px; }
 }
 .die.rolling { transform: rotate(720deg) scale(1.05); }
 
-/* Полностью скрываем точки у граней */
-.die::before, .die::after { display:none !important; }
+/* ВАЖНО: полностью убираем точки на кубиках */
+.die::before, .die::after,
+.face-1::before, .face-1::after,
+.face-2::before, .face-2::after,
+.face-3::before, .face-3::after,
+.face-4::before, .face-4::after,
+.face-5::before, .face-5::after,
+.face-6::before, .face-6::after { display:none !important; content:none !important; }
 
 /* Текст на кубике */
 .label{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  padding:12px; text-align:center; line-height:1.15; font-weight:800;
-  /* авто-подгон шрифта под размер кубика */
-  font-size: clamp(11px, 3.8vw, 18px);
-  color:var(--accent); text-shadow: 0 2px 8px rgba(0,0,0,.6);
-  pointer-events:none; opacity:0; transition: opacity .2s .1s; z-index:10;
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  padding:12px; text-align:center; line-height:1.15;
+  font-weight:800; font-size:16px;
+  color:var(--accent);
+  text-shadow: 0 2px 8px rgba(0,0,0,.6);
+  pointer-events:none;
+  opacity:0; transition: opacity .2s .1s;
+  z-index: 10;
 }
 .die.show .label{ opacity:1; }
 
-.roll{
-  width:180px; padding:12px 16px; border:none; border-radius:14px; font-weight:600; font-size:16px; cursor:pointer;
+/* кнопка / контролы */
+.roll {
+  width:180px; padding:12px 16px; border:none; border-radius:14px;
+  font-weight:600; font-size:16px; cursor:pointer;
   background:linear-gradient(135deg, var(--accent), #b794f6); color:#0a0b0e;
 }
 .roll:active { transform: translateY(1px); }
 
 .controls { display:flex; gap:12px; align-items:center; }
 .mode select { background:var(--card); color:var(--fg); border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:8px; }
+
 footer { margin-top:auto; text-align:center; color:var(--muted); }
+
+/* адаптив текста внутри кубиков */
+@media (max-width:420px){ .label{ font-size:14px; padding:10px; } }
+@media (min-width:520px){ .label{ font-size:17px; } }
