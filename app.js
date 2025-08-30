@@ -1,92 +1,73 @@
-// v=5
-const tg = window.Telegram?.WebApp;
-if (tg){
-  tg.expand();
-  tg.setHeaderColor('#0e0f12');
-  tg.setBackgroundColor('#0e0f12');
+:root {
+  --bg:#0e0f12; --card:#15171c; --fg:#e9ecf1; --muted:#9aa3af; --accent:#7bd3ff;
+  --die: 124px;            /* было 96px → стало ~1.3x */
+  --die-radius: 24px;      /* было 18px → слегка больше */
+}
+* { box-sizing: border-box; }
+html, body { height:100%; }
+body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; color:var(--fg); background:var(--bg); }
+#app { min-height:100%; display:flex; flex-direction:column; padding:24px; gap:16px; }
+header { text-align:center; }
+h1 { margin:0; font-size:24px; }
+.sub { margin:6px 0 0; color:var(--muted); font-size:14px; }
+
+main { display:flex; flex-direction:column; align-items:center; gap:16px; }
+.dice-wrap {
+  display:flex; flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; padding:12px;
 }
 
-const ACTIONS = {
-  soft: [
-    "нежно поцеловать", "погладить", "ласково обнять",
-    "шепнуть комплимент", "лёгкий массаж", "встретиться взглядом и улыбнуться"
-  ],
-  spicy: [
-    "страстно поцеловать", "несмело покусать", "провести кончиками пальцев",
-    "шёпот на ушко и поцелуй", "медленно погладить", "обнять крепче и поцеловать"
-  ],
-  extra: [
-    "поцеловать, не отводя взгляда", "ласково прикусить", "очертить линию губами",
-    "задать дерзкий комплимент и поцеловать", "медленно помассировать", "поиграть дыханием"
-  ]
-};
-const PARTS = {
-  soft: ["шею","губы","ушко","спину","живот","ладонь"],
-  spicy: ["ключицу","нижнюю губу","внутреннюю сторону предплечья","поясницу","линию челюсти","коленку"],
-  extra: ["линию шеи до ключицы","уголок губ","за ушком","нижнюю часть спины","солнечное сплетение","впадинку ключицы"]
-};
-
-const die1 = document.getElementById('die1');
-const die2 = document.getElementById('die2');
-const label1 = document.getElementById('label1');
-const label2 = document.getElementById('label2');
-const rollBtn = document.getElementById('rollBtn');
-const spice = document.getElementById('spice');
-
-let rolling = false;
-
-function rnd1to6(){ return 1 + Math.floor(Math.random()*6); }
-function setFace(el, v){
-  // «лица» оставляем только как внутреннее состояние — визуально точек нет
-  el.classList.remove('face-1','face-2','face-3','face-4','face-5','face-6');
-  el.classList.add(`face-${v}`);
+.die {
+  width:var(--die); height:var(--die);
+  border-radius:var(--die-radius); background:var(--card);
+  position:relative; overflow:hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05);
+  transition: transform .7s cubic-bezier(.2,.7,.2,1.1);
 }
+.die.rolling { transform: rotate(720deg) scale(1.05); }
 
-async function haptic(type="impact"){
-  try{
-    if (!tg || !tg.HapticFeedback) return;
-    if (type==="impact") tg.HapticFeedback.impactOccurred("medium");
-    if (type==="success") tg.HapticFeedback.notificationOccurred("success");
-  }catch(e){}
+/* полностью убираем точки */
+.die::before, .die::after,
+.face-1::before, .face-1::after,
+.face-2::before, .face-2::after,
+.face-3::before, .face-3::after,
+.face-4::before, .face-4::after,
+.face-5::before, .face-5::after,
+.face-6::before, .face-6::after { display:none !important; content:none !important; }
+
+/* текст на кубике */
+.label{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  padding:12px; text-align:center; line-height:1.15;
+  font-weight:800; font-size:18px;          /* базовый размер (дальше JS подгонит) */
+  color:var(--accent);
+  text-shadow: 0 2px 8px rgba(0,0,0,.6);
+  pointer-events:none;
+  opacity:0; transition: opacity .2s .1s;
+  z-index: 10;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
+.die.show .label{ opacity:1; }
 
-async function roll(){
-  if (rolling) return;
-  rolling = true;
-  await haptic("impact");
-
-  // старт анимации
-  die1.classList.remove('show'); die2.classList.remove('show');
-  die1.classList.add('rolling'); die2.classList.add('rolling');
-
-  const v1 = rnd1to6();
-  const v2 = rnd1to6();
-
-  await new Promise(r => setTimeout(r, 850));
-
-  setFace(die1, v1);
-  setFace(die2, v2);
-  die1.classList.remove('rolling'); 
-  die2.classList.remove('rolling');
-
-  const mode = spice.value;
-  label1.textContent = ACTIONS[mode][v1-1];   // слева — действие
-  label2.textContent = PARTS[mode][v2-1];     // справа — часть тела
-
-  die1.classList.add('show'); 
-  die2.classList.add('show');
-
-  await haptic("success");
-  rolling = false;
+/* кнопка / контролы */
+.roll {
+  width:200px; padding:12px 16px; border:none; border-radius:14px;
+  font-weight:600; font-size:16px; cursor:pointer;
+  background:linear-gradient(135deg, var(--accent), #b794f6); color:#0a0b0e;
+  margin-top:4px;
 }
+.roll:active { transform: translateY(1px); }
 
-// кнопка
-rollBtn.textContent = "Бросай";
-rollBtn.addEventListener('click', roll);
+.controls { display:flex; gap:12px; align-items:center; }
+.mode select { background:var(--card); color:var(--fg); border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:8px; }
 
-// ПЕРВЫЙ ЭКРАН — вводные на кубиках
-setFace(die1, 1); setFace(die2, 1);
-label1.textContent = "действие";
-label2.textContent = "часть тела";
-die1.classList.add('show');
-die2.classList.add('show');
+footer { margin-top:auto; text-align:center; color:var(--muted); }
+
+/* адаптив: на очень узких экранах немного ужимаем кубы */
+@media (max-width:360px){
+  :root { --die: 112px; --die-radius: 20px; }
+  .label{ font-size:16px; padding:10px; }
+}
+@media (min-width:520px){ .label{ font-size:19px; } }
