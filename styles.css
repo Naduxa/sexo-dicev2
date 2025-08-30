@@ -1,4 +1,8 @@
-:root { --bg:#0e0f12; --card:#15171c; --fg:#e9ecf1; --muted:#9aa3af; --accent:#7bd3ff; }
+:root {
+  --bg:#0e0f12; --card:#15171c; --fg:#e9ecf1; --muted:#9aa3af; --accent:#7bd3ff;
+  --die: 124px;            /* было 96px → стало ~1.3x */
+  --die-radius: 24px;      /* было 18px → слегка больше */
+}
 * { box-sizing: border-box; }
 html, body { height:100%; }
 body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; color:var(--fg); background:var(--bg); }
@@ -8,17 +12,20 @@ h1 { margin:0; font-size:24px; }
 .sub { margin:6px 0 0; color:var(--muted); font-size:14px; }
 
 main { display:flex; flex-direction:column; align-items:center; gap:16px; }
-.dice-wrap { display:flex; gap:24px; justify-content:center; align-items:center; padding:12px; }
+.dice-wrap {
+  display:flex; flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; padding:12px;
+}
 
 .die {
-  width:96px; height:96px; border-radius:18px; background:var(--card);
+  width:var(--die); height:var(--die);
+  border-radius:var(--die-radius); background:var(--card);
   position:relative; overflow:hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05);
   transition: transform .7s cubic-bezier(.2,.7,.2,1.1);
 }
 .die.rolling { transform: rotate(720deg) scale(1.05); }
 
-/* ВАЖНО: полностью убираем точки на кубиках */
+/* полностью убираем точки */
 .die::before, .die::after,
 .face-1::before, .face-1::after,
 .face-2::before, .face-2::after,
@@ -27,25 +34,29 @@ main { display:flex; flex-direction:column; align-items:center; gap:16px; }
 .face-5::before, .face-5::after,
 .face-6::before, .face-6::after { display:none !important; content:none !important; }
 
-/* Текст на кубике */
+/* текст на кубике */
 .label{
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
   padding:12px; text-align:center; line-height:1.15;
-  font-weight:800; font-size:16px;
+  font-weight:800; font-size:18px;          /* базовый размер (дальше JS подгонит) */
   color:var(--accent);
   text-shadow: 0 2px 8px rgba(0,0,0,.6);
   pointer-events:none;
   opacity:0; transition: opacity .2s .1s;
   z-index: 10;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 .die.show .label{ opacity:1; }
 
 /* кнопка / контролы */
 .roll {
-  width:180px; padding:12px 16px; border:none; border-radius:14px;
+  width:200px; padding:12px 16px; border:none; border-radius:14px;
   font-weight:600; font-size:16px; cursor:pointer;
   background:linear-gradient(135deg, var(--accent), #b794f6); color:#0a0b0e;
+  margin-top:4px;
 }
 .roll:active { transform: translateY(1px); }
 
@@ -54,6 +65,9 @@ main { display:flex; flex-direction:column; align-items:center; gap:16px; }
 
 footer { margin-top:auto; text-align:center; color:var(--muted); }
 
-/* адаптив текста внутри кубиков */
-@media (max-width:420px){ .label{ font-size:14px; padding:10px; } }
-@media (min-width:520px){ .label{ font-size:17px; } }
+/* адаптив: на очень узких экранах немного ужимаем кубы */
+@media (max-width:360px){
+  :root { --die: 112px; --die-radius: 20px; }
+  .label{ font-size:16px; padding:10px; }
+}
+@media (min-width:520px){ .label{ font-size:19px; } }
